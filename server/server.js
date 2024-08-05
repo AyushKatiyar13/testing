@@ -1,69 +1,92 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
+const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://192.168.1.6:5173",
     methods: ["GET", "POST"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
+app.use(cors({ origin: "http://192.168.1.6:5173", credentials: true }));
 
 let drawingHistory = {}; // Store drawing history for each session
 
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
-  socket.on('join', (sessionId) => {
+  socket.on("join", (sessionId) => {
     socket.join(sessionId);
     console.log(`User ${socket.id} joined session: ${sessionId}`);
+
     if (!drawingHistory[sessionId]) {
       drawingHistory[sessionId] = { history: [], redoStack: [] };
     }
+
     // Send existing history to the newly joined user
-    socket.emit('drawingHistory', drawingHistory[sessionId].history);
+    socket.emit("drawingHistory", drawingHistory[sessionId].history);
   });
 
-  socket.on('drawing', (data) => {
-    console.log('Received drawing data:', data);
-    const sessionId = data.sessionId;
-    
-    if (data.tool === 'undo') {
-      const lastAction = drawingHistory[sessionId].history.pop();
-      if (lastAction) {
-        drawingHistory[sessionId].redoStack.push(lastAction);
-        io.to(sessionId).emit('drawing', { tool: 'undo', sessionId });
-      }
-    } else if (data.tool === 'redo') {
-      const redoAction = drawingHistory[sessionId].redoStack.pop();
-      if (redoAction) {
-        drawingHistory[sessionId].history.push(redoAction);
-        io.to(sessionId).emit('drawing', { tool: 'redo', sessionId, ...redoAction });
-      }
-    } else if (data.tool === 'reset') {
-      drawingHistory[sessionId] = { history: [], redoStack: [] };
-      io.to(sessionId).emit('drawing', data);
-    } else {
-      drawingHistory[sessionId].history.push(data);
-      drawingHistory[sessionId].redoStack = []; // Clear redo stack on new action
-      io.to(sessionId).emit('drawing', data);
+  // Handle audio status updates
+  socket.on("audioStatus", ({ sessionId, status }) => {
+    console.log(`User ${socket.id} has turned ${status} their audio.`);
+    if (sessionId) {
+      socket.to(sessionId).emit("audioStatus", { userId: socket.id, status });
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  // Handle drawing data
+  socket.on("drawing", (data) => {
+    console.log("Received drawing data:", data);
+    const { sessionId, tool } = data;
+
+    if (!drawingHistory[sessionId]) {
+      drawingHistory[sessionId] = { history: [], redoStack: [] };
+    }
+
+    if (tool === "undo") {
+      const lastAction = drawingHistory[sessionId].history.pop();
+      if (lastAction) {
+        drawingHistory[sessionId].redoStack.push(lastAction);
+        io.to(sessionId).emit("drawing", { tool: "undo", sessionId });
+      }
+    } else if (tool === "redo") {
+      const redoAction = drawingHistory[sessionId].redoStack.pop();
+      if (redoAction) {
+        drawingHistory[sessionId].history.push(redoAction);
+        io.to(sessionId).emit("drawing", {
+          tool: "redo",
+          sessionId,
+          ...redoAction,
+        });
+      }
+    } else if (tool === "reset") {
+      drawingHistory[sessionId] = { history: [], redoStack: [] };
+      io.to(sessionId).emit("drawing", data);
+    } else {
+      // Normal drawing action
+      drawingHistory[sessionId].history.push(data);
+      drawingHistory[sessionId].redoStack = []; // Clear redo stack on new action
+      io.to(sessionId).emit("drawing", data);
+    }
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 
-server.listen(4000, () => {
-  console.log('Server running on http://localhost:4000');
+// server.js
+server.listen(4000, "0.0.0.0", () => {
+  console.log("Server running on http://0.0.0.0:4000");
+});
+
+app.get("/test", (req, res) => {
+  res.send("Server is up and running!");
 });
