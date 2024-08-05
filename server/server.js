@@ -7,11 +7,12 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https://66b10a69a22e2a3914ea36a6--peaceful-peony-bb07cc.netlify.app",
+    origin: "https://66b113071a567e43f9e383b4--peaceful-peony-bb07cc.netlify.app",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
+
 
 app.use(cors({ origin: "https://66b10a69a22e2a3914ea36a6--peaceful-peony-bb07cc.netlify.app", credentials: true }));
 
