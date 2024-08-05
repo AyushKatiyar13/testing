@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 import io from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import "./App.css";
-import AudioCommunication from "./AudioCommunication";
 
 // Replace with your server URL
 const socket = io("https://66b1181a388a0745cd4ab0dd--peaceful-peony-bb07cc.netlify.app/", {
@@ -217,10 +216,7 @@ function App() {
   return (
     <div className="App">
       {sessionId ? (
-        <>
-          <Whiteboard sessionId={sessionId} />
-          <AudioCommunication sessionId={sessionId} />
-        </>
+        <Whiteboard sessionId={sessionId} />
       ) : (
         <button onClick={generateLink}>Create New Whiteboard</button>
       )}
