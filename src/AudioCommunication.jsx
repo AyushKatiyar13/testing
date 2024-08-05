@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import io from "socket.io-client";
 
 // Replace with your server URL
-const socket = io("http://192.168.1.6:4000", {
+const socket = io("https://66b10a69a22e2a3914ea36a6--peaceful-peony-bb07cc.netlify.app/", {
   withCredentials: true,
   transports: ["websocket"],
 });

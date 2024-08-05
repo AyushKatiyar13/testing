@@ -5,7 +5,7 @@ import "./App.css";
 import AudioCommunication from "./AudioCommunication";
 
 // Replace with your server URL
-const socket = io("http://192.168.1.6:4000", {
+const socket = io("wss://your-websocket-server-domain.com", {
   withCredentials: true,
   transports: ["websocket"],
 });
