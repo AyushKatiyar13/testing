@@ -7,14 +7,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https:https://ayushkatiyar13.github.io/testing/",
+    origin: "https://ayushkatiyar13.github.io",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-
-app.use(cors({ origin: "https:https://ayushkatiyar13.github.io/testing/", credentials: true }));
+app.use(cors({ origin: "https://ayushkatiyar13.github.io", credentials: true }));
 
 let drawingHistory = {}; // Store drawing history for each session
 
@@ -31,14 +30,6 @@ io.on("connection", (socket) => {
 
     // Send existing history to the newly joined user
     socket.emit("drawingHistory", drawingHistory[sessionId].history);
-  });
-
-  // Handle audio status updates
-  socket.on("audioStatus", ({ sessionId, status }) => {
-    console.log(`User ${socket.id} has turned ${status} their audio.`);
-    if (sessionId) {
-      socket.to(sessionId).emit("audioStatus", { userId: socket.id, status });
-    }
   });
 
   // Handle drawing data
