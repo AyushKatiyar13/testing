@@ -7,14 +7,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https://peaceful-peony-bb07cc.netlify.app/",
+    origin: "https:https://ayushkatiyar13.github.io/testing/",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
 
-app.use(cors({ origin: "https://66b10a69a22e2a3914ea36a6--peaceful-peony-bb07cc.netlify.app", credentials: true }));
+app.use(cors({ origin: "https:https://ayushkatiyar13.github.io/testing/", credentials: true }));
 
 let drawingHistory = {}; // Store drawing history for each session
 
