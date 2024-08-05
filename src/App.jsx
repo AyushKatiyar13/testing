@@ -5,7 +5,7 @@ import "./App.css";
 import AudioCommunication from "./AudioCommunication";
 
 // Replace with your server URL
-const socket = io("https://ayushkatiyar13.github.io/testing/", {
+const socket = io("https://66b1181a388a0745cd4ab0dd--peaceful-peony-bb07cc.netlify.app/", {
   withCredentials: true,
   transports: ["websocket"],
 });
